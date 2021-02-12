@@ -1,0 +1,124 @@
+<script>
+   $(document).ready(function () {
+      $("#btnsave").click(function () {
+         let output = "";
+         let sid = $("#stuid").val();
+         let nm = $("#name").val();
+         let em = $("#email").val();
+         let el = $("#enroll").val();
+         let csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+         if (nm == "") {
+         } else if (em == "") {
+         } else if (el == "") {
+         } else {
+            mydata = {stuid:sid,name: nm, email: em, enroll: el, csrfmiddlewaretoken: csrftoken };
+            $.ajax({
+               url: "{% url 'save' %}",
+               type: "POST",
+               data: mydata,
+               success: function (data) {
+                  x = data.student_data
+                  if (data.status == "Save") {
+                     for (i = 0; i < x.length; i++) {
+                        output += "<tr><td>" + (i + 1) + "</td><td>" + x[i].name + "</td><td>" + x[i].email + "</td><td>" + x[i].enroll + "</td><td>" +  "<a data-sid='" + x[i].id +"' id='up' href=''>edit</a>" + "</td><td>" + "<a data-sid='" + x[i].id +"' id='del' href=''>delete</a></td></tr>"
+                        console.log("🚀 ~ file: ajex.html ~ line 23 ~ x[i].id", x[i].id)
+                       
+                     }
+                     $("form")[0].reset();
+                     $("#tbody").html(output);
+                     
+                  }
+                  if (data.status == 0) {
+                     
+                  }
+               },
+            });
+            $("#stuid").val('')
+            return false;
+         }
+      });
+       
+      $("tbody").on("click", "#del", function () {
+
+
+         let pk = $(this).attr("data-sid")
+         console.log("🚀 ~ file: ajex.html ~ line 43 ~ id", pk)
+         
+         let csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+         mythis = this;
+         console.log("🚀 ~ file: ajex.html ~ line 46 ~ mythis", mythis)
+        
+
+         mydata = { sid: pk, csrfmiddlewaretoken: csrftoken };
+         console.log("🚀 ~ file: ajex.html ~ line 48 ~ mydata", mydata)
+         
+         
+         $.ajax({
+            url: "{% url 'delete'  %}",
+            type: "POST",
+            data: mydata,
+            success: function (data) {
+            console.log("🚀 ~ file: ajex.html ~ line 54 ~ data", data)
+            
+
+               if (data.status == 1) {
+                  $(mythis).closest("tr").fadeOut();
+                  }
+                  return false;
+                  
+               if (data.status == 0) {
+                  console.log("not delete");
+                  }
+                  return false;  
+            }
+            
+        });
+         return false;
+         
+      });
+      $("tbody").on("click", "#up", function () {
+
+
+         let id = $(this).attr("data-sid")
+         console.log("🚀 ~ file: ajex.html ~ line 43 ~ id", id)
+         
+         let csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+         mythis = this;
+         console.log("🚀 ~ file: ajex.html ~ line 46 ~ mythis", mythis)
+         
+
+         mydata = { stuid:id, csrfmiddlewaretoken: csrftoken };
+         console.log("🚀 ~ file: ajex.html ~ line 48 ~ mydata", mydata)
+         
+         
+         $.ajax({
+            url: "{% url 'update'  %}",
+            type: "POST",
+            data: mydata,
+            success: function (data) {
+            console.log("🚀 ~ file: ajex.html ~ line 54 ~ data", data)
+            
+
+               $("#stuid").val(data.id)
+               $("#name").val(data.name);
+               $("#email").val(data.email);
+               $("#enroll").val(data.enroll);
+               
+               return false;
+                  
+               if (data.status == 0) {
+                  console.log("not edit");
+                  }
+                  return false;  
+            }
+            
+        });
+        
+         return false;
+         
+      });
+   });
+
+   
+  
+</script>
